@@ -5,23 +5,24 @@ import { Button } from '../atoms/Button.js';
 import { Text } from '../atoms/Text.js';
 import * as store from '../../services/store.js';
 import * as exporter from '../../services/exporter.js';
-import * as quranContent from '../../services/quranContent.js';
 import { labels } from '../../labels.js';
-
-const PREVIEW_MAX = 3; // sourates affichées dans l'aperçu
 
 // Historique des prières. Retourne { el, destroy }.
 export function HistoryScreen({ navigate }) {
   const el = document.createElement('div');
   el.className = 'screen screen--history';
-  let chapters = null;
   let banner = null;
 
-  // Sourates distinctes dans l'ordre récité : "Al-Fatihah · Al-Baqarah".
-  function preview(session) {
-    const surahs = [...new Set(session.passages.map((p) => p.surah))];
-    const names = surahs.slice(0, PREVIEW_MAX).map((s) => chapters?.[s]?.name ?? labels.result.surah(s));
-    return names.join(' · ') + (surahs.length > PREVIEW_MAX ? ' …' : '');
+  // Sessions (plus récentes d'abord) regroupées par jour local.
+  function byDay(sessions) {
+    const days = [];
+    for (const s of sessions) {
+      const key = new Date(s.createdAt).toDateString();
+      let day = days.at(-1);
+      if (day?.key !== key) days.push((day = { key, date: s.createdAt, sessions: [] }));
+      day.sessions.push({ id: s.id, label: s.label, createdAt: s.createdAt });
+    }
+    return days;
   }
 
   function rename(id) {
@@ -86,13 +87,7 @@ export function HistoryScreen({ navigate }) {
     parts.push(
       sessions.length
         ? HistoryList({
-            sessions: sessions.map((s) => ({
-              id: s.id,
-              label: s.label,
-              createdAt: s.createdAt,
-              passageCount: s.passages.length,
-              preview: preview(s),
-            })),
+            days: byDay(sessions),
             onOpen: (id) => navigate(`#/result/${encodeURIComponent(id)}`),
             onRename: rename,
             onDelete: remove,
@@ -111,13 +106,6 @@ export function HistoryScreen({ navigate }) {
 
   const unsubscribe = store.subscribe(render);
   render();
-  // Noms des sourates (cache ou réseau) : l'aperçu passe de « Sourate 2 » à « Al-Baqarah ».
-  quranContent.getChapters().then((c) => {
-    if (c) {
-      chapters = c;
-      render();
-    }
-  });
 
   return { el, destroy: unsubscribe };
 }

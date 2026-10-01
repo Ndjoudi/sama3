@@ -16,7 +16,7 @@ L'audio est supprimé dès que le résultat est reçu. Seul le résultat (léger
 ## 2. Périmètre
 
 **Dans le périmètre**
-- Enregistrement local, écran éteint et verrouillé, sans réseau
+- Enregistrement local, écran maintenu allumé (voir §6), sans réseau
 - File d'attente : traitement dès que le réseau est disponible
 - Transcription arabe approximative (API Whisper via proxy serverless)
 - Matching flou contre le texte coranique, côté navigateur
@@ -54,7 +54,8 @@ L'audio est supprimé dès que le résultat est reçu. Seul le résultat (léger
     organisms/              ← RecorderPanel, QueueList, PassageList, VerseDetail, HistoryList
     screens/                ← RecordScreen, ResultScreen, HistoryScreen
 /src/services/
-    recorder.js             ← MediaRecorder (enregistrement écran verrouillé, voir §6)
+    recorder.js             ← MediaRecorder + niveau sonore (voir §6)
+    wakeLock.js             ← écran maintenu allumé pendant l'enregistrement
     audioStore.js           ← IndexedDB : audio en attente
     queue.js                ← file d'attente + détection réseau
     api.js                  ← SEUL point d'appel réseau
@@ -110,15 +111,15 @@ Aucun texte arabe, traduction ni tafsir stocké dans la session : récupérés v
 
 ## 6. Enregistrement
 
-**Exigence : l'enregistrement doit continuer écran éteint et verrouillé, téléphone en poche, pendant toute la prière (jusqu'à ~25 min).** Pas d'écran maintenu allumé.
+**Exigence : l'enregistrement doit couvrir toute la prière (jusqu'à ~25 min).**
+
+**Décision (test du 2026-10-01, iPhone iOS 18.7) :** Safari coupe le micro d'une page web dès que l'écran se verrouille. L'utilisateur a choisi de **garder l'écran allumé** pendant l'enregistrement (Screen Wake Lock API, `services/wakeLock.js`), téléphone posé écran vers le sol, non verrouillé. Options écartées : coquille native Capacitor (compte Apple payant ou réinstallation hebdomadaire), import depuis Dictaphone.
 
 - `MediaRecorder` en `audio/webm;codecs=opus` (fallback `audio/mp4` sur iOS), débit bas (~32 kbps)
-- Un navigateur peut suspendre le micro quand l'écran se verrouille (surtout iOS). **Un web app pur ne le garantit pas.** L'étape 3 commence donc par un test de faisabilité (`/dev/lock-test.html`) : enregistrer 5 min écran verrouillé, puis vérifier la durée du fichier et l'absence de trous
-- Selon le résultat du test, deux voies, **décidées avec l'utilisateur, jamais choisies seul** :
-  1. Web pur, si le test est concluant sur son téléphone
-  2. Même code web embarqué dans une coquille native (Capacitor) avec enregistrement en arrière-plan. Seule l'enveloppe change, les composants et services restent identiques
-- Écran d'enregistrement minimal : un seul gros bouton, timer, aucune autre action pendant l'enregistrement
-- Démarrage par un tap **avant** la prière, puis verrouillage du téléphone
+- Écran maintenu allumé du début à la fin de l'enregistrement ; le verrou est repris si la page redevient visible. Si le téléphone est verrouillé malgré tout, l'audio déjà capturé est conservé (voir plus bas)
+- Jauge du niveau sonore en direct (`LevelMeter`) pour vérifier que la récitation est bien captée
+- Écran d'enregistrement minimal : un seul gros bouton, timer, jauge, aucune autre action pendant l'enregistrement
+- Démarrage par un tap **avant** la prière ; le téléphone n'est pas verrouillé
 - Le blob est écrit dans IndexedDB à l'arrêt, puis la file d'attente prend le relais
 - Si le micro est refusé ou si l'enregistrement est interrompu : message explicite, l'audio partiel déjà capturé est conservé et traité
 
@@ -214,7 +215,8 @@ export function VerseCard({ surah, ayah, arabic, translation, onSelect }) {
 | Risque | Mitigation |
 |---|---|
 | Écho / bruit en mosquée | Transcription approximative tolérée, matching flou, continuité |
-| Le navigateur coupe le micro écran verrouillé | Test de faisabilité dès l'étape 3 ; repli sur coquille native (Capacitor) si échec |
+| Le navigateur coupe le micro écran verrouillé | Confirmé sur iOS : écran maintenu allumé (Wake Lock), consigne affichée de ne pas verrouiller |
+| Batterie consommée par l'écran allumé | Téléphone posé écran vers le sol, luminosité minimale conseillée |
 | Versets très similaires | Règle de continuité (§8.4) |
 | Limite de taille de l'API de transcription | Débit audio bas ; si dépassement, découpage côté client (à valider avant de coder) |
 

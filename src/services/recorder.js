@@ -1,5 +1,8 @@
 // Enregistrement micro via MediaRecorder (§6).
 // Un seul enregistrement à la fois. L'audio partiel est conservé si le système coupe le micro.
+// L'écran est maintenu allumé pendant l'enregistrement (wakeLock.js).
+
+import * as wakeLock from './wakeLock.js';
 
 const MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'];
 const BITRATE = 32000;
@@ -108,6 +111,7 @@ export async function start({ onInterrupted } = {}) {
 
   recorder.start(TIMESLICE_MS);
   current = session;
+  wakeLock.keepAwake();
 }
 
 // Arrête et retourne { blob, mime, startedAt, durationSec, interrupted:false }.
@@ -121,6 +125,7 @@ function finalize(session, interrupted) {
     const done = () => {
       session.stream.getTracks().forEach((t) => t.stop());
       session.meter?.ctx.close().catch(() => {});
+      wakeLock.release();
       if (current === session) current = null;
       const mime = (session.recorder.mimeType || pickMime() || 'audio/webm').split(';')[0];
       resolve({
