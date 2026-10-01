@@ -105,6 +105,10 @@
   --record-size: 9.5rem;
   --record-halo: 0.75rem;
   --timer-dot: 0.625rem;
+  --meter-height: 4rem;
+  --meter-bar: 3px;
+  --meter-gap: 2px;
+  --meter-dot: 2px;
   --empty-mark: 4rem;
   --reading-max: 38rem;
   --nav-height: 3.5rem;

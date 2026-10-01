@@ -684,3 +684,27 @@
   flex-direction: column;
   justify-content: center;
 }
+
+/* — LevelMeter — */
+
+.level-meter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--meter-gap);
+  width: 100%;
+  height: var(--meter-height);
+  color: var(--color-line-strong);
+}
+
+.level-meter--active {
+  color: var(--color-accent);
+}
+
+.level-meter__bar {
+  flex: none;
+  width: var(--meter-bar);
+  height: max(var(--meter-dot), calc(var(--level) * 100%));
+  border-radius: var(--radius-full);
+  background: currentColor;
+}

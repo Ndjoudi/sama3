@@ -50,7 +50,7 @@ L'audio est supprimé dès que le résultat est reçu. Seul le résultat (léger
 /src/main.js                ← point d'entrée, routeur
 /src/components/
     atoms/                  ← Button, IconButton, Icon, Badge, Spinner, Text
-    molecules/              ← RecordButton, Timer, StatusBanner, VerseCard, PassageHeader, Tabs, EmptyState
+    molecules/              ← RecordButton, Timer, LevelMeter, StatusBanner, VerseCard, PassageHeader, Tabs, EmptyState
     organisms/              ← RecorderPanel, QueueList, PassageList, VerseDetail, HistoryList
     screens/                ← RecordScreen, ResultScreen, HistoryScreen
 /src/services/
@@ -170,11 +170,11 @@ Navigation : barre basse à 2 entrées (Enregistrer, Historique). ResultScreen s
 ## 12. Inventaire des composants (liste FERMÉE)
 
 **Atoms** : `Button`, `IconButton`, `Icon`, `Badge`, `Spinner`, `Text`
-**Molecules** : `RecordButton`, `Timer`, `StatusBanner`, `VerseCard`, `PassageHeader`, `Tabs`, `EmptyState`
+**Molecules** : `RecordButton`, `Timer`, `LevelMeter`, `StatusBanner`, `VerseCard`, `PassageHeader`, `Tabs`, `EmptyState`
 **Organisms** : `RecorderPanel`, `QueueList`, `PassageList`, `VerseDetail`, `HistoryList`
 **Screens** : `RecordScreen`, `ResultScreen`, `HistoryScreen`
 
-Total : 21. Un besoin non couvert → proposer l'ajout au README et attendre validation.
+Total : 22. (`LevelMeter` ajouté à la demande : niveau du son capté en direct pendant l'enregistrement.) Un besoin non couvert → proposer l'ajout au README et attendre validation.
 
 ## 13. Contrat d'un composant
 

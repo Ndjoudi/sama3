@@ -1,5 +1,6 @@
 import { RecordButton } from '../molecules/RecordButton.js';
 import { Timer } from '../molecules/Timer.js';
+import { LevelMeter } from '../molecules/LevelMeter.js';
 import { StatusBanner } from '../molecules/StatusBanner.js';
 import { Text } from '../atoms/Text.js';
 import { labels } from '../../labels.js';
@@ -12,8 +13,9 @@ const HINT = {
 };
 
 // state : idle | starting | recording | saving
+// levels : niveaux sonores récents (0 à 1) pour la jauge en direct
 // banner : { tone, title, message } | null — erreur ou information après un arrêt
-export function RecorderPanel({ state = 'idle', seconds = 0, banner = null, onStart, onStop, onDismissBanner }) {
+export function RecorderPanel({ state = 'idle', seconds = 0, levels = [], banner = null, onStart, onStop, onDismissBanner }) {
   const el = document.createElement('section');
   el.className = `recorder recorder--${state}`;
 
@@ -21,6 +23,7 @@ export function RecorderPanel({ state = 'idle', seconds = 0, banner = null, onSt
   center.className = 'recorder__center';
   center.append(
     Timer({ seconds, active: state === 'recording' }),
+    LevelMeter({ levels, active: state === 'recording' }),
     RecordButton({ state, onStart, onStop }),
     Text({ text: HINT[state], variant: 'small', tone: 'muted' }),
   );

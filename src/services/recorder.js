@@ -4,6 +4,9 @@
 const MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'];
 const BITRATE = 32000;
 const TIMESLICE_MS = 1000; // morceaux réguliers : rien n'est perdu en cas d'interruption
+const METER_FLOOR_DB = -60; // en dessous : silence (niveau 0)
+const METER_CURVE = 2; // > 1 : les sons faibles restent bas, les pics ressortent
+const METER_FFT = 1024;
 
 // Codes d'erreur (libellés dans labels.js).
 export const RECORDER_ERROR = Object.freeze({
@@ -21,7 +24,7 @@ export class RecorderError extends Error {
   }
 }
 
-let current = null; // { recorder, stream, chunks, startedAt, stopping, onInterrupted }
+let current = null; // { recorder, stream, chunks, startedAt, stopping, onInterrupted, meter }
 
 export function isSupported() {
   return Boolean(navigator.mediaDevices?.getUserMedia && window.MediaRecorder);
@@ -38,6 +41,34 @@ export function elapsedSec() {
 
 function pickMime() {
   return MIME_CANDIDATES.find((m) => MediaRecorder.isTypeSupported?.(m)) ?? '';
+}
+
+// Analyseur du niveau sonore, branché sur le flux micro. Facultatif : l'enregistrement marche sans.
+function createMeter(stream) {
+  try {
+    const ctx = new AudioContext();
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = METER_FFT;
+    ctx.createMediaStreamSource(stream).connect(analyser);
+    ctx.resume?.();
+    return { ctx, analyser, buffer: new Float32Array(METER_FFT) };
+  } catch {
+    return null;
+  }
+}
+
+// Niveau sonore instantané entre 0 (silence) et 1 (très fort), échelle en décibels.
+export function level() {
+  const meter = current?.meter;
+  if (!meter) return 0;
+  meter.analyser.getFloatTimeDomainData(meter.buffer);
+  let sum = 0;
+  for (const v of meter.buffer) sum += v * v;
+  const rms = Math.sqrt(sum / meter.buffer.length);
+  if (!rms) return 0;
+  const db = 20 * Math.log10(rms);
+  const linear = Math.min(1, Math.max(0, (db - METER_FLOOR_DB) / -METER_FLOOR_DB));
+  return linear ** METER_CURVE;
 }
 
 // onInterrupted(result) : appelé si le système arrête l'enregistrement de lui-même.
@@ -62,7 +93,7 @@ export async function start({ onInterrupted } = {}) {
 
   const mime = pickMime();
   const recorder = new MediaRecorder(stream, { mimeType: mime || undefined, audioBitsPerSecond: BITRATE });
-  const session = { recorder, stream, chunks: [], startedAt: new Date(), stopping: null, onInterrupted };
+  const session = { recorder, stream, chunks: [], startedAt: new Date(), stopping: null, onInterrupted, meter: createMeter(stream) };
 
   recorder.ondataavailable = (e) => {
     if (e.data.size) session.chunks.push(e.data);
@@ -89,6 +120,7 @@ function finalize(session, interrupted) {
   session.stopping ??= new Promise((resolve) => {
     const done = () => {
       session.stream.getTracks().forEach((t) => t.stop());
+      session.meter?.ctx.close().catch(() => {});
       if (current === session) current = null;
       const mime = (session.recorder.mimeType || pickMime() || 'audio/webm').split(';')[0];
       resolve({

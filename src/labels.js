@@ -11,6 +11,7 @@ export const labels = {
     start: 'Commencer',
     stop: 'Arrêter',
     saving: 'Enregistrement…',
+    meter: 'Niveau du son capté',
     hintIdle: 'Touchez avant la prière, puis verrouillez le téléphone.',
     hintRecording: 'Vous pouvez verrouiller le téléphone. Touchez à la fin de la prière.',
     hintSaving: 'Mise de côté de l’enregistrement…',
