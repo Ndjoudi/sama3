@@ -45,11 +45,13 @@ export default {
     const cors = corsHeaders(request, env);
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     if (request.method !== 'POST') return json({ error: 'method' }, 405, cors);
+    if (!cors['Access-Control-Allow-Origin']) console.log('origine refusée', request.headers.get('Origin'));
     if (!cors['Access-Control-Allow-Origin']) return json({ error: 'origin' }, 403, cors);
     if (!env.GROQ_API_KEY) return json({ error: 'config' }, 500, cors);
 
     const type = (request.headers.get('Content-Type') ?? '').split(';')[0].trim();
     const ext = EXTENSIONS[type];
+    if (!ext) console.log('format refusé', type);
     if (!ext) return json({ error: 'format' }, 415, cors);
     if (Number(request.headers.get('Content-Length')) > MAX_BYTES) return json({ error: 'too-large' }, 413, cors);
 
@@ -71,6 +73,7 @@ export default {
       headers: { Authorization: `Bearer ${env.GROQ_API_KEY}` },
       body: form,
     });
+    if (!upstream.ok) console.log('groq', upstream.status, type, audio.byteLength, (await upstream.clone().text()).slice(0, 500));
     // 429 = quota gratuit du jour atteint : la file d'attente proposera « Réessayer ».
     if (!upstream.ok) return json({ error: upstream.status === 429 ? 'quota' : 'upstream', status: upstream.status }, 502, cors);
 
