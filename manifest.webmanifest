@@ -1,0 +1,12 @@
+{
+  "name": "Sama3",
+  "short_name": "Sama3",
+  "description": "Retrouver les versets entendus pendant la prière.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}

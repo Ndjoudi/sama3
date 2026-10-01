@@ -1,0 +1,150 @@
+/* Sama3 — tokens.css
+   Seule source de valeurs visuelles du projet (§11, §14.1).
+   Thème clair (fond blanc, accent bleu) par défaut ;
+   variante sombre uniquement si forcée via <html data-theme="dark">. */
+
+:root {
+  color-scheme: light;
+
+  /* — Couleurs : clair (défaut) — blanc, encre neutre, bleu — */
+  --color-bg: #ffffff;
+  --color-surface: #f6f7f9;
+  --color-surface-raised: #ffffff;
+  --color-line: #e4e7ec;
+  --color-line-strong: #c9ced7;
+
+  --color-text: #1a1d23;
+  --color-text-muted: #5a6170;
+  --color-text-faint: #8d94a1;
+
+  --color-accent: #1d5bd6;
+  --color-accent-strong: #1747ab;
+  --color-on-accent: #ffffff;
+  --color-accent-soft: rgba(29, 91, 214, 0.1);
+
+  --color-danger: #c2412d;
+  --color-danger-strong: #a33422;
+  --color-on-danger: #ffffff;
+  --color-danger-soft: rgba(194, 65, 45, 0.1);
+
+  --color-success: #2f7a4b;
+  --color-success-soft: rgba(47, 122, 75, 0.1);
+
+  --color-info: #1f6f86;
+  --color-info-soft: rgba(31, 111, 134, 0.1);
+
+  --color-neutral-soft: rgba(26, 29, 35, 0.05);
+
+  --color-focus: #1d5bd6;
+  --color-backdrop: rgba(26, 29, 35, 0.4);
+
+  /* — Ombres : très discrètes, on sépare par filets plutôt que par élévation — */
+  --shadow-raised: 0 1px 2px rgba(26, 29, 35, 0.06), 0 6px 16px rgba(26, 29, 35, 0.06);
+  --shadow-press: 0 0 0 rgba(0, 0, 0, 0);
+
+  /* — Typographie — */
+  --font-ui: "Seravek", "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Palatino", "Book Antiqua", Georgia, serif;
+  --font-arabic: "Noto Naskh Arabic", serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.5rem;
+  --text-display: 2.125rem;
+  --text-arabic: 1.75rem;
+  --text-arabic-lg: 2.125rem;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-arabic: 2.2;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  --tracking-label: 0.06em;
+  --tracking-display: -0.01em;
+
+  /* — Espacements (base 4px) — */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* — Rayons — */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* — Bordures — */
+  --border-thin: 1px;
+  --border-focus: 2px;
+  --focus-offset: 2px;
+
+  /* — Dimensions — */
+  --touch-min: 44px;
+  --hidden-size: 1px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 28px;
+  --icon-stroke: 1.75;
+  --spinner-md: 20px;
+  --spinner-lg: 36px;
+  --spinner-stroke: 2px;
+  --badge-height: 24px;
+  --layout-max: 30rem;
+  --gutter: 1rem;
+  --record-size: 9.5rem;
+  --record-halo: 0.75rem;
+  --timer-dot: 0.625rem;
+  --empty-mark: 4rem;
+  --reading-max: 38rem;
+  --nav-height: 3.5rem;
+
+  /* — Mouvement — */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 900ms;
+  --duration-pulse: 1800ms;
+  --duration-instant: 0.01ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --press-scale: 0.97;
+  --opacity-disabled: 0.4;
+}
+
+/* — Variante sombre (forcée uniquement) — */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #121418;
+  --color-surface: #1a1d23;
+  --color-surface-raised: #22262e;
+  --color-line: #2b3039;
+  --color-line-strong: #414855;
+  --color-text: #e8ebf0;
+  --color-text-muted: #a2a9b6;
+  --color-text-faint: #6c7381;
+  --color-accent: #6f9cff;
+  --color-accent-strong: #93b5ff;
+  --color-on-accent: #0d1424;
+  --color-accent-soft: rgba(111, 156, 255, 0.15);
+  --color-danger: #e5826b;
+  --color-danger-strong: #efa08e;
+  --color-on-danger: #1a0f0c;
+  --color-danger-soft: rgba(229, 130, 107, 0.15);
+  --color-success: #79c08f;
+  --color-success-soft: rgba(121, 192, 143, 0.15);
+  --color-info: #6fb6c9;
+  --color-info-soft: rgba(111, 182, 201, 0.15);
+  --color-neutral-soft: rgba(232, 235, 240, 0.07);
+  --color-focus: #93b5ff;
+  --color-backdrop: rgba(8, 9, 11, 0.72);
+  --shadow-raised: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 6px 18px rgba(0, 0, 0, 0.35);
+}

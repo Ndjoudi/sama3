@@ -1,0 +1,77 @@
+/* Mise en page des pages de test /dev uniquement. Tokens uniquement. */
+
+.dev {
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding: var(--space-6) var(--gutter) var(--space-12);
+}
+
+.dev__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.dev__section {
+  padding-block: var(--space-6);
+  border-top: var(--border-thin) solid var(--color-line);
+}
+
+.dev__section > .text--label {
+  display: block;
+  margin-bottom: var(--space-4);
+  color: var(--color-text-faint);
+}
+
+.dev__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dev__stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dev__swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.dev__swatch {
+  aspect-ratio: 1;
+  border: var(--border-thin) solid var(--color-line);
+  border-radius: var(--radius-sm);
+}
+
+.dev__log {
+  margin-top: var(--space-4);
+}
+
+.dev__entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block: var(--space-2);
+  border-bottom: var(--border-thin) solid var(--color-line);
+}
+
+.dev__entry > .text {
+  flex: 1 1 100%;
+}
+
+.dev__textarea {
+  width: 100%;
+  min-height: 10rem;
+  padding: var(--space-3);
+  border: var(--border-thin) solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}

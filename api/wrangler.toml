@@ -1,0 +1,11 @@
+# Déploiement du proxy de transcription sur Cloudflare Workers.
+# Depuis le dossier api/ :  npx wrangler deploy
+# Clé :                     npx wrangler secret put OPENAI_API_KEY
+
+name = "sama3-transcribe"
+main = "transcribe.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Origines autorisées (séparées par des virgules). localhost est toujours accepté pour le développement.
+ALLOWED_ORIGINS = "https://VOTRE-COMPTE.github.io"
