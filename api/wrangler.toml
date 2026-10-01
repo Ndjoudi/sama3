@@ -8,4 +8,4 @@ compatibility_date = "2026-09-01"
 
 [vars]
 # Origines autorisées (séparées par des virgules). localhost est toujours accepté pour le développement.
-ALLOWED_ORIGINS = "https://VOTRE-COMPTE.github.io"
+ALLOWED_ORIGINS = "https://ndjoudi.github.io"
