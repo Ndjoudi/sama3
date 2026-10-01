@@ -1,6 +1,6 @@
 # Déploiement du proxy de transcription sur Cloudflare Workers.
 # Depuis le dossier api/ :  npx wrangler deploy
-# Clé :                     npx wrangler secret put OPENAI_API_KEY
+# Clé Groq (gratuite) :     npx wrangler secret put GROQ_API_KEY
 
 name = "sama3-transcribe"
 main = "transcribe.js"

@@ -107,6 +107,7 @@ export const labels = {
     'not-configured': 'Le service de transcription n’est pas encore configuré.',
     'too-large': 'Enregistrement trop volumineux pour être analysé.',
     timeout: 'Le service a mis trop de temps à répondre.',
+    quota: 'Limite gratuite du jour atteinte. Réessayez plus tard.',
     http: 'Le service de transcription a renvoyé une erreur.',
     invalid: 'Réponse inattendue du service de transcription.',
     unknown: 'Une erreur inattendue est survenue.',

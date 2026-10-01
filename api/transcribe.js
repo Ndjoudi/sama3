@@ -1,11 +1,12 @@
 // Proxy de transcription (Cloudflare Worker).
-// Reçoit l'audio brut en POST, le transmet à Whisper (langue arabe), renvoie { segments: [{ start, end, text }] }.
-// La clé reste dans la variable d'environnement OPENAI_API_KEY. L'audio n'est jamais écrit : il ne vit qu'en mémoire
+// Reçoit l'audio brut en POST, le transmet à Whisper chez Groq (offre gratuite, langue arabe),
+// renvoie { segments: [{ start, end, text }] }.
+// La clé reste dans la variable d'environnement GROQ_API_KEY. L'audio n'est jamais écrit : il ne vit qu'en mémoire
 // le temps de la requête.
 
-const OPENAI_URL = 'https://api.openai.com/v1/audio/transcriptions';
-const MODEL = 'whisper-1';
-const MAX_BYTES = 25 * 1024 * 1024; // limite de l'API Whisper
+const GROQ_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
+const MODEL = 'whisper-large-v3'; // le plus précis ; mêmes limites gratuites que la version turbo
+const MAX_BYTES = 25 * 1024 * 1024; // limite de l'offre gratuite Groq
 // Amorce : oriente Whisper vers l'orthographe coranique usuelle.
 const PROMPT = 'بسم الله الرحمن الرحيم. الحمد لله رب العالمين.';
 
@@ -45,7 +46,7 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     if (request.method !== 'POST') return json({ error: 'method' }, 405, cors);
     if (!cors['Access-Control-Allow-Origin']) return json({ error: 'origin' }, 403, cors);
-    if (!env.OPENAI_API_KEY) return json({ error: 'config' }, 500, cors);
+    if (!env.GROQ_API_KEY) return json({ error: 'config' }, 500, cors);
 
     const type = (request.headers.get('Content-Type') ?? '').split(';')[0].trim();
     const ext = EXTENSIONS[type];
@@ -65,12 +66,13 @@ export default {
     form.append('temperature', '0');
     form.append('prompt', PROMPT);
 
-    const upstream = await fetch(OPENAI_URL, {
+    const upstream = await fetch(GROQ_URL, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${env.OPENAI_API_KEY}` },
+      headers: { Authorization: `Bearer ${env.GROQ_API_KEY}` },
       body: form,
     });
-    if (!upstream.ok) return json({ error: 'upstream', status: upstream.status }, 502, cors);
+    // 429 = quota gratuit du jour atteint : la file d'attente proposera « Réessayer ».
+    if (!upstream.ok) return json({ error: upstream.status === 429 ? 'quota' : 'upstream', status: upstream.status }, 502, cors);
 
     const data = await upstream.json();
     const segments = (data.segments ?? []).map((s) => ({ start: s.start, end: s.end, text: String(s.text ?? '').trim() }));

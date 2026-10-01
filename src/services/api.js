@@ -1,13 +1,13 @@
 // SEUL point d'appel réseau du projet (§14.4).
 
 // URL du proxy de transcription déployé (api/transcribe.js). Vide = pas encore configuré.
-const TRANSCRIBE_URL = '';
+const TRANSCRIBE_URL = 'https://sama3-transcribe.djoudi-feed.workers.dev';
 const TRANSCRIBE_TIMEOUT_MS = 5 * 60 * 1000;
 const MAX_UPLOAD_BYTES = 24 * 1024 * 1024; // sous la limite Whisper de 25 Mo
 
 const QURAN_TEXT_URL = new URL('../../content/quran-simple.json', import.meta.url);
 
-// Codes : offline | http | timeout | invalid | too-large | not-configured
+// Codes : offline | http | timeout | invalid | too-large | quota | not-configured
 export class ApiError extends Error {
   constructor(code, cause) {
     super(code);
@@ -29,7 +29,10 @@ async function request(url, { timeoutMs = 30000, ...init } = {}) {
     clearTimeout(timer);
   }
   if (res.status === 413) throw new ApiError('too-large');
-  if (!res.ok) throw new ApiError('http', new Error(`HTTP ${res.status}`));
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new ApiError(body?.error === 'quota' ? 'quota' : 'http', new Error(`HTTP ${res.status}`));
+  }
   try {
     return await res.json();
   } catch (err) {
